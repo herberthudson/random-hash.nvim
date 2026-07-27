@@ -19,12 +19,7 @@ Generate **cryptographically secure random hashes** (CSPRNG) directly in Neovim.
 ```lua
 {
   "herberthudson/random-hash.nvim",  -- adjust to your source
-  lazy = false,
   opts = {},               -- calls setup() with defaults
-  keys = {
-    { "<Leader>rh", desc = "Insert 64-char hex hash" },
-    { "<Leader>rb", desc = "Insert 64-char base64 hash" },
-  },
 }
 ```
 

@@ -124,7 +124,9 @@ end
 function M.insert_hex()
   local hash = M.hex()
   if hash then
-    vim.api.nvim_put({ hash }, "c", true, true)
+    local buf = vim.api.nvim_get_current_buf()
+    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+    vim.api.nvim_buf_set_text(buf, row - 1, col, row - 1, col, { hash })
   end
 end
 
@@ -132,7 +134,9 @@ end
 function M.insert_base64()
   local hash = M.base64()
   if hash then
-    vim.api.nvim_put({ hash }, "c", true, true)
+    local buf = vim.api.nvim_get_current_buf()
+    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+    vim.api.nvim_buf_set_text(buf, row - 1, col, row - 1, col, { hash })
   end
 end
 
