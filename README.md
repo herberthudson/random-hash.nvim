@@ -72,13 +72,40 @@ Call `setup()` in your Neovim config (lazy.nvim does this automatically when you
 
 ```lua
 require("random-hash").setup({
-  prefix = "<Leader>r",          -- prefix for keymaps
   keymaps = {
-    hex    = "h",                 -- <Leader>rh
-    base64 = "b",                 -- <Leader>rb
+    hex    = "<Leader>rh",        -- default: <Leader>rh
+    base64 = "<Leader>rb",        -- default: <Leader>rb
   },
 })
 ```
+
+### Custom keymaps
+
+Specify any key sequence you want:
+
+```lua
+require("random-hash").setup({
+  keymaps = {
+    hex    = "<Leader>hh",
+    base64 = "<Leader>hb",
+  },
+})
+```
+
+### Disable a keymap
+
+Set it to `false`:
+
+```lua
+require("random-hash").setup({
+  keymaps = {
+    hex    = false,               -- no hex keymap
+    base64 = "<Leader>rb",
+  },
+})
+```
+
+Commands `:RandomHashHex` / `:RandomHashBase64` are always available.
 
 ## Security
 

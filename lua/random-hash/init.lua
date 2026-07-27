@@ -1,7 +1,7 @@
 -- random-hash.nvim
 -- Generate cryptographically secure random hashes (CSPRNG) via /dev/urandom
 -- Commands: :RandomHashHex, :RandomHashBase64
--- Mappings: <Leader>rh (hex), <Leader>rb (base64)
+-- Default mappings: <Leader>rh (hex), <Leader>rb (base64) — configurable
 
 -- ---------------------------------------------------------------------------
 -- CSPRNG source: read from /dev/urandom
@@ -120,13 +120,31 @@ function M.base64_bytes(n_bytes)
   return to_base64(data)
 end
 
+---Insert text at cursor position (works in any mode: normal, insert, visual).
+---@param text string
+local function insert_at_cursor(text)
+  local mode = vim.api.nvim_get_mode().mode
+  if mode == "n" or mode == "v" or mode == "V" or mode == "\22" then
+    -- Normal/Visual mode: schedule the insert so Neovim finishes processing
+    -- the key sequence before we modify the buffer.
+    vim.schedule(function()
+      local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+      vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { text })
+      vim.api.nvim_win_set_cursor(0, { row, col + #text })
+    end)
+  else
+    -- Insert/terminal mode: direct buffer edit
+    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+    vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { text })
+    vim.api.nvim_win_set_cursor(0, { row, col + #text })
+  end
+end
+
 ---Insert a 64-char hex hash at the cursor position.
 function M.insert_hex()
   local hash = M.hex()
   if hash then
-    local buf = vim.api.nvim_get_current_buf()
-    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-    vim.api.nvim_buf_set_text(buf, row - 1, col, row - 1, col, { hash })
+    insert_at_cursor(hash)
   end
 end
 
@@ -134,9 +152,7 @@ end
 function M.insert_base64()
   local hash = M.base64()
   if hash then
-    local buf = vim.api.nvim_get_current_buf()
-    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-    vim.api.nvim_buf_set_text(buf, row - 1, col, row - 1, col, { hash })
+    insert_at_cursor(hash)
   end
 end
 
@@ -144,14 +160,13 @@ end
 -- Setup: commands + keymaps
 -- ---------------------------------------------------------------------------
 local defaults = {
-  prefix = "<Leader>r",
   keymaps = {
-    hex = "h",
-    base64 = "b",
+    hex = "<Leader>rh",
+    base64 = "<Leader>rb",
   },
 }
 
----@param opts? {prefix?: string, keymaps?: {hex?: string, base64?: string}}
+---@param opts? {keymaps?: {hex?: string|false, base64?: string|false}}
 function M.setup(opts)
   opts = vim.tbl_deep_extend("force", defaults, opts or {})
 
@@ -165,16 +180,18 @@ function M.setup(opts)
     M.insert_base64()
   end, { desc = "Insert 64-char CSPRNG base64 hash at cursor" })
 
-  -- Normal-mode keymaps
-  local hex_map = opts.prefix .. opts.keymaps.hex
-  vim.keymap.set("n", hex_map, function()
-    M.insert_hex()
-  end, { desc = "Insert 64-char hex hash" })
+  -- Normal-mode keymaps (set false to disable a keymap)
+  if opts.keymaps.hex then
+    vim.keymap.set("n", opts.keymaps.hex, function()
+      M.insert_hex()
+    end, { desc = "Insert 64-char hex hash" })
+  end
 
-  local b64_map = opts.prefix .. opts.keymaps.base64
-  vim.keymap.set("n", b64_map, function()
-    M.insert_base64()
-  end, { desc = "Insert 64-char base64 hash" })
+  if opts.keymaps.base64 then
+    vim.keymap.set("n", opts.keymaps.base64, function()
+      M.insert_base64()
+    end, { desc = "Insert 64-char base64 hash" })
+  end
 end
 
 return M
