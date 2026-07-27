@@ -18,7 +18,7 @@ Generate **cryptographically secure random hashes** (CSPRNG) directly in Neovim.
 
 ```lua
 {
-  "herbert/random-hash",  -- adjust to your source
+  "herberthudson/random-hash.nvim",  -- adjust to your source
   lazy = false,
   opts = {},               -- calls setup() with defaults
   keys = {
@@ -32,7 +32,7 @@ Generate **cryptographically secure random hashes** (CSPRNG) directly in Neovim.
 
 ```lua
 use {
-  "herbert/random-hash",
+  "herberthudson/random-hash.nvim",
   config = function()
     require("random-hash").setup({})
   end,
@@ -43,16 +43,16 @@ use {
 
 ### Commands
 
-| Command | Action |
-|---|---|
-| `:RandomHashHex` | Insert a 64-character **hex** hash at cursor |
+| Command             | Action                                          |
+| ------------------- | ----------------------------------------------- |
+| `:RandomHashHex`    | Insert a 64-character **hex** hash at cursor    |
 | `:RandomHashBase64` | Insert a 64-character **base64** hash at cursor |
 
 ### Default keymaps
 
-| Key | Action |
-|---|---|
-| `<Leader>rh` | Insert hex hash |
+| Key          | Action             |
+| ------------ | ------------------ |
+| `<Leader>rh` | Insert hex hash    |
 | `<Leader>rb` | Insert base64 hash |
 
 ### From Lua
